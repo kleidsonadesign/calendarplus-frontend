@@ -1,3 +1,31 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+:root {
+  /* Paleta de Cores (Dark Theme Moderno) */
+  --bg-primary: #09090b;   /* Fundo quase preto */
+  --bg-secondary: #18181b; /* Cinza muito escuro para cartões/header */
+  --text-primary: #fafafa; /* Branco gelo */
+  --text-secondary: #a1a1aa; /* Cinza claro */
+  --accent-color: #6366f1; /* Indigo/Roxo moderno */
+  --accent-hover: #4f46e5;
+  
+  /* Configuração de Fonte */
+  --font-main: 'Inter', system-ui, Avenir, Helvetica, Arial, sans-serif;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: var(--font-main);
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+}
