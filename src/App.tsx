@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import io from 'socket.io-client';
 import { QRCodeSVG } from 'qrcode.react';
 import axios from 'axios';
-import { LogOut, Loader2, CheckCircle, Smartphone, Calendar, Bot, AlertTriangle, Menu, X } from 'lucide-react';
+import { LogOut, Loader2, CheckCircle, Smartphone, Calendar, Bot, AlertTriangle } from 'lucide-react';
 
 // === CONFIGURAÇÃO DO SERVIDOR ===
 const API_URL = import.meta.env.VITE_API_URL;
@@ -16,12 +16,12 @@ const socket = io(API_URL || '', {
 });
 
 function App() {
-  // Estados
+  // CORREÇÃO DE TYPE: Define que clientId pode ser string ou nulo
   const [clientId, setClientId] = useState<string | null>(null);
   const [qrCode, setQrCode] = useState('');
   const [status, setStatus] = useState('Carregando...');
    
-  // 1. Verifica se voltou do login do Google ao carregar a página
+  // 1. Verifica login ao carregar
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const idFromUrl = params.get('clientId');
@@ -29,18 +29,20 @@ function App() {
     if (idFromUrl) {
       setClientId(idFromUrl);
       iniciarSistema(idFromUrl);
-      // Limpa a URL para ficar bonita (remove ?clientId=...)
+      // Limpa a URL visualmente
       window.history.replaceState({}, document.title, "/");
     }
   }, []);
 
-  // 2. Ouve eventos do WebSocket (Socket.io)
+  // 2. Ouve eventos do Socket
   useEffect(() => {
+    // CORREÇÃO DE TYPE: Adicionado (qr: string)
     socket.on('qr', (qr: string) => { 
         setQrCode(qr); 
         setStatus('Escaneie o QR Code abaixo'); 
     });
     
+    // CORREÇÃO DE TYPE: Adicionado (msg: string)
     socket.on('status', (msg: string) => { 
       if (msg === 'connected') { 
         setStatus('✅ Conectado com Sucesso!'); 
@@ -54,7 +56,7 @@ function App() {
     };
   }, []);
 
-  // Função para acordar o backend e iniciar sessão
+  // CORREÇÃO DE TYPE: Adicionado (emailId: string)
   const iniciarSistema = async (emailId: string) => {
       if (!API_URL) return;
       setStatus('Conectando ao servidor...');
@@ -68,7 +70,6 @@ function App() {
       }
   };
 
-  // Redireciona para o Google
   const loginComGoogle = () => {
       if (!API_URL) {
           alert("Erro de configuração: URL da API não definida.");
@@ -77,14 +78,13 @@ function App() {
       window.location.href = `${API_URL}/auth/google`;
   };
 
-  // Função de Logout
   const handleLogout = async () => {
     if (!clientId || !API_URL) return;
     
     if (confirm("Deseja realmente desconectar e sair?")) {
         try {
             await axios.post(`${API_URL}/session/logout`, { clientId });
-            // Recarrega a página para limpar tudo
+            // Força recarregamento para limpar estados
             window.location.href = '/';
         } catch (error) {
             alert("Erro ao tentar desconectar.");
@@ -92,7 +92,7 @@ function App() {
     }
   };
 
-  // Ícone do Google (SVG Inline para não precisar de arquivo extra)
+  // Ícone do Google (SVG Inline)
   const GoogleIcon = () => (
     <svg className="w-5 h-5" viewBox="0 0 24 24">
       <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />
@@ -103,94 +103,59 @@ function App() {
   );
 
   // ==========================================================================
-  // RENDERIZAÇÃO
+  // TELA 1: LOGIN (LANDING PAGE INTEGRADA)
   // ==========================================================================
-
-  // CENÁRIO 1: USUÁRIO NÃO LOGADO (Mostra a Landing Page / Login)
   if (!clientId) {
       return (
-          <div className="min-h-screen bg-[#0A0A0B] text-white font-sans selection:bg-purple-500/30 overflow-x-hidden relative">
+          <div className="min-h-screen bg-[#0A0A0B] text-white font-sans flex flex-col items-center justify-center p-4 selection:bg-purple-500/30 overflow-hidden relative">
               
-              {/* Navbar Transparente */}
-              <nav className="absolute top-0 w-full p-6 flex justify-between items-center z-20">
-                <div className="flex items-center gap-2">
-                    <div className="bg-purple-600/20 p-2 rounded-lg backdrop-blur-md border border-purple-500/10">
-                        <Calendar className="w-6 h-6 text-purple-400" />
-                    </div>
-                    <span className="font-bold text-xl tracking-tight">CalendarPlus</span>
-                </div>
-                <button onClick={loginComGoogle} className="text-sm font-medium text-slate-300 hover:text-white transition-colors">
-                    Fazer Login
-                </button>
-              </nav>
-
-              {/* Background Effects */}
-              <div className="fixed inset-0 overflow-hidden pointer-events-none">
-                <div className="absolute -top-[20%] -left-[10%] w-[600px] h-[600px] bg-purple-600/20 rounded-full blur-[120px] opacity-40 mix-blend-screen"></div>
-                <div className="absolute top-[40%] -right-[10%] w-[500px] h-[500px] bg-blue-600/10 rounded-full blur-[120px] opacity-30 mix-blend-screen"></div>
+              {/* Efeitos de Fundo */}
+              <div className="absolute top-0 left-0 w-full h-full overflow-hidden -z-10 pointer-events-none">
+                <div className="absolute top-[-10%] left-[-10%] w-96 h-96 bg-purple-600/20 rounded-full blur-[100px] opacity-40"></div>
+                <div className="absolute bottom-[-10%] right-[-10%] w-96 h-96 bg-blue-600/20 rounded-full blur-[100px] opacity-40"></div>
               </div>
 
-              {/* Hero Section (Login) */}
-              <div className="container mx-auto px-4 min-h-screen flex flex-col justify-center items-center relative z-10 pt-20">
-                  
-                  <div className="text-center max-w-3xl mx-auto space-y-8">
-                      
-                      {/* Badge IA */}
-                      <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-purple-500/10 border border-purple-500/20 text-purple-300 text-xs font-medium">
-                        <span className="flex h-2 w-2 relative">
-                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-purple-400 opacity-75"></span>
-                            <span className="relative inline-flex rounded-full h-2 w-2 bg-purple-500"></span>
-                        </span>
-                        IA Gemini 1.5 Flash Integrada
-                      </div>
-
-                      {/* Título */}
-                      <h1 className="text-5xl md:text-7xl font-extrabold leading-tight tracking-tight">
-                        Sua agenda lotada,<br />
-                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-blue-500">
-                           sem atender o celular.
-                        </span>
-                      </h1>
-
-                      {/* Subtítulo */}
-                      <p className="text-lg text-slate-400 max-w-xl mx-auto leading-relaxed">
-                        A secretária virtual que atende seus clientes no WhatsApp 24h por dia e agenda diretamente no Google Calendar.
-                      </p>
-
-                      {/* Botão de Login Grande */}
-                      <div className="flex flex-col items-center gap-4 pt-4">
-                        <button 
-                            onClick={loginComGoogle} 
-                            className="group relative bg-white text-slate-900 px-8 py-4 rounded-2xl font-bold text-lg hover:bg-gray-100 transition-all flex items-center gap-3 shadow-xl shadow-purple-500/10 hover:scale-[1.02] active:scale-95"
-                        >
-                            <GoogleIcon />
-                            <span>Continuar com Google</span>
-                        </button>
-                        <p className="text-xs text-slate-500">Teste grátis. Não requer cartão de crédito.</p>
-                      </div>
-
-                      {/* Erro de Configuração (Só aparece se faltar ENV) */}
-                      {!API_URL && (
-                          <div className="mt-8 mx-auto max-w-md p-4 bg-red-500/10 border border-red-500/20 rounded-xl flex items-center gap-3 text-red-400 text-sm">
-                              <AlertTriangle className="w-5 h-5 shrink-0" />
-                              <span>ERRO: Variável <strong>VITE_API_URL</strong> não configurada na Vercel!</span>
-                          </div>
-                      )}
+              <div className="w-full max-w-md bg-[#18181B] border border-white/5 p-8 rounded-3xl shadow-2xl text-center z-10">
+                  <div className="mx-auto w-16 h-16 bg-purple-500/10 rounded-2xl flex items-center justify-center mb-6 border border-purple-500/20">
+                    <Bot className="w-8 h-8 text-purple-400" />
                   </div>
+                  
+                  <h1 className="text-3xl font-bold mb-2 tracking-tight">ZapAgendador</h1>
+                  <p className="text-slate-400 mb-8 text-sm leading-relaxed">
+                    Sua secretária virtual com IA.<br/>
+                    Atende no WhatsApp e agenda no Google.
+                  </p>
+                  
+                  <button 
+                    onClick={loginComGoogle} 
+                    className="w-full bg-white text-black font-bold py-4 rounded-xl flex items-center justify-center gap-3 hover:bg-gray-100 transition-all transform hover:scale-[1.02] shadow-xl shadow-purple-500/10"
+                  >
+                    <GoogleIcon />
+                    Entrar com Google
+                  </button>
+
+                  {!API_URL && (
+                      <div className="mt-6 p-3 bg-red-500/10 border border-red-500/20 rounded-lg flex items-center gap-2 text-red-400 text-xs text-left">
+                          <AlertTriangle className="w-4 h-4 shrink-0" />
+                          <span>ERRO: Configure VITE_API_URL na Vercel!</span>
+                      </div>
+                  )}
               </div>
 
-              <footer className="absolute bottom-6 w-full text-center text-slate-600 text-xs">
-                &copy; 2025 CalendarPlus • Tecnologia Google AI
+              <footer className="mt-12 text-slate-600 text-xs">
+                &copy; 2025 CalendarPlus • Tecnologia Gemini IA
               </footer>
           </div>
       );
   }
 
-  // CENÁRIO 2: USUÁRIO LOGADO (Mostra o Dashboard / QR Code)
+  // ==========================================================================
+  // TELA 2: DASHBOARD (ESTILIZADA)
+  // ==========================================================================
   return (
     <div className="min-h-screen bg-[#0A0A0B] text-white font-sans flex flex-col items-center justify-center p-4">
       
-      {/* Navbar Dashboard */}
+      {/* Navbar Minimalista */}
       <nav className="fixed top-0 w-full p-6 flex justify-between items-center bg-[#0A0A0B]/90 backdrop-blur-md z-10 border-b border-white/5">
         <div className="flex items-center gap-2">
             <Calendar className="w-5 h-5 text-purple-500" />
@@ -198,14 +163,14 @@ function App() {
         </div>
         <button 
             onClick={handleLogout}
-            className="flex items-center gap-2 text-red-400 hover:text-red-300 transition-colors text-sm font-medium border border-red-500/20 px-4 py-1.5 rounded-full hover:bg-red-500/10"
+            className="flex items-center gap-2 text-red-400 hover:text-red-300 transition-colors text-sm font-medium border border-red-500/20 px-3 py-1.5 rounded-full hover:bg-red-500/10"
         >
             <LogOut size={14} /> Sair
         </button>
       </nav>
 
-      {/* Cartão Central */}
-      <div className="w-full max-w-md bg-[#18181B] border border-white/5 rounded-3xl p-8 shadow-2xl relative overflow-hidden mt-12">
+      {/* Cartão Principal */}
+      <div className="w-full max-w-md bg-[#18181B] border border-white/5 rounded-3xl p-8 shadow-2xl relative overflow-hidden mt-10">
         
         {/* Header do Cartão */}
         <div className="text-center mb-8 border-b border-white/5 pb-6">
@@ -214,8 +179,7 @@ function App() {
         </div>
 
         <div className="flex flex-col items-center justify-center min-h-[300px]">
-            
-            {/* ESTADO: CONECTADO ✅ */}
+            {/* CENÁRIO: CONECTADO ✅ */}
             {status.includes('✅') ? (
                  <div className="animate-in fade-in zoom-in duration-500 flex flex-col items-center text-center">
                      <div className="w-24 h-24 bg-green-500/10 rounded-full flex items-center justify-center mb-6 ring-1 ring-green-500/30">
@@ -232,7 +196,7 @@ function App() {
                      </div>
                  </div>
             ) : (
-                /* ESTADO: AGUARDANDO QR CODE OU CARREGANDO ⏳ */
+                /* CENÁRIO: QR CODE OU CARREGANDO */
                 <div className="flex flex-col items-center text-center w-full">
                     
                     {qrCode ? (
