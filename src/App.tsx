@@ -1,37 +1,46 @@
-import './App.css' // Certifique-se de importar o CSS acima
+import './App.css'; // Importa o estilo específico deste componente
 
 function App() {
   return (
-    <div className="login-card">
+    <div className="app-wrapper">
       
-      {/* Ícone ou Logo Principal */}
-      <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>
-        🤖
-      </div>
+      {/* --- Header / Barra de Navegação --- */}
+      <header className="navbar">
+        <div className="logo-container">
+          {/* Imagem puxando direto da pasta public */}
+          <img src="/Calendar.png" alt="Logo Calendar" className="logo-icon" />
+          <span className="logo-text">Calendario +</span>
+        </div>
+        
+        <nav className="nav-menu">
+          <a href="#home">Início</a>
+          <a href="#recursos">Recursos</a>
+          <button className="btn-outline">Login</button>
+        </nav>
+      </header>
 
-      <h1>ZapAgendador</h1>
-      
-      <p className="subtitle">
-        Sua secretária virtual com IA.<br />
-        Atende no WhatsApp e agenda no Google.
-      </p>
+      {/* --- Conteúdo Principal (Hero Section) --- */}
+      <main className="hero-section">
+        <div className="hero-content">
+          <h1 className="hero-title">
+            Organize seu tempo <br />
+            <span className="gradient-text">sem complicações.</span>
+          </h1>
+          
+          <p className="hero-description">
+            A ferramenta perfeita para conectar seu WhatsApp ao Google Calendar.
+            Agendamentos automáticos, simples e rápidos.
+          </p>
 
-      {/* Botão Google - Substitua o '#' pela sua rota de login */}
-      <a href="/auth/google" className="btn-google">
-        <img 
-          src="https://www.svgrepo.com/show/475656/google-color.svg" 
-          alt="Google Logo" 
-          style={{ width: '20px', height: '20px' }} 
-        />
-        Entrar com Google
-      </a>
-
-      <div className="footer">
-        © 2025 CalendarPlus • Tecnologia Gemini IA
-      </div>
+          <div className="hero-buttons">
+            <button className="btn-primary">Começar Agora</button>
+            <button className="btn-secondary">Saber mais</button>
+          </div>
+        </div>
+      </main>
 
     </div>
-  )
+  );
 }
 
-export default App
+export default App;
