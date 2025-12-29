@@ -1,149 +1,159 @@
-/* =========================================
-   1. Variáveis e Reset (Configurações Globais)
-   ========================================= */
-:root {
-  --bg-color: #0f172a;       /* Azul muito escuro (quase preto) */
-  --card-bg: #1e293b;        /* Azul um pouco mais claro para cartões */
-  --primary-color: #3b82f6;  /* Azul destaque */
-  --text-main: #f8fafc;      /* Branco gelo para texto principal */
-  --text-secondary: #94a3b8; /* Cinza para textos secundários */
-  --font-family: 'Inter', system-ui, -apple-system, sans-serif;
-}
-
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-body {
-  background-color: var(--bg-color);
-  color: var(--text-main);
-  font-family: var(--font-family);
-  -webkit-font-smoothing: antialiased;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-}
-
-/* =========================================
-   2. Layout Principal (Container)
-   ========================================= */
-.app-container {
-  width: 100%;
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 20px;
+/* Container principal */
+.app-wrapper {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
 }
 
-/* =========================================
-   3. Cabeçalho (Header) e Logo
-   ========================================= */
-.header {
+/* --- Navbar --- */
+.navbar {
   display: flex;
-  align-items: center;
   justify-content: space-between;
-  padding: 20px 0;
-  margin-bottom: 60px;
+  align-items: center;
+  padding: 1.5rem 2rem;
+  background-color: rgba(9, 9, 11, 0.8); /* Fundo semi-transparente */
+  backdrop-filter: blur(10px); /* Efeito de vidro */
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  border-bottom: 1px solid #27272a;
 }
 
-.logo-area {
+.logo-container {
   display: flex;
   align-items: center;
-  gap: 12px; /* Espaço entre o ícone e o nome */
-  font-weight: 700;
-  font-size: 1.5rem;
-  color: var(--text-main);
-  cursor: pointer;
+  gap: 12px;
 }
 
-/* Configuração Específica para o Calendar.png */
-.logo-img {
-  width: 40px;  /* Tamanho controlado do ícone */
-  height: 40px;
+.logo-icon {
+  width: 32px;
+  height: 32px;
   object-fit: contain;
-  filter: drop-shadow(0 0 8px rgba(59, 130, 246, 0.5)); /* Brilho sutil */
 }
 
-/* Navegação simples (opcional) */
-.nav-links a {
+.logo-text {
+  font-weight: 700;
+  font-size: 1.25rem;
+  letter-spacing: -0.5px;
+}
+
+.nav-menu {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.nav-menu a {
   color: var(--text-secondary);
   text-decoration: none;
-  margin-left: 24px;
-  transition: color 0.3s;
+  font-size: 0.95rem;
+  transition: color 0.2s;
 }
 
-.nav-links a:hover {
-  color: var(--primary-color);
+.nav-menu a:hover {
+  color: var(--text-primary);
 }
 
-/* =========================================
-   4. Conteúdo Principal (Hero Section)
-   ========================================= */
-.main-content {
-  flex: 1; /* Empurra o rodapé para baixo */
+/* --- Botões --- */
+.btn-outline {
+  background: transparent;
+  border: 1px solid #3f3f46;
+  color: var(--text-primary);
+  padding: 8px 16px;
+  border-radius: 6px;
+  transition: all 0.2s;
+}
+
+.btn-outline:hover {
+  border-color: var(--text-primary);
+}
+
+.btn-primary {
+  background-color: var(--accent-color);
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 1rem;
+  transition: background 0.2s;
+}
+
+.btn-primary:hover {
+  background-color: var(--accent-hover);
+}
+
+.btn-secondary {
+  background-color: transparent;
+  color: var(--text-primary);
+  border: 1px solid #3f3f46;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 1rem;
+  transition: background 0.2s;
+}
+
+.btn-secondary:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+/* --- Hero Section --- */
+.hero-section {
+  flex: 1;
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
   text-align: center;
-  padding-bottom: 60px;
+  padding: 80px 20px;
 }
 
-.title {
+.hero-content {
+  max-width: 800px;
+}
+
+.hero-title {
   font-size: 3.5rem;
-  line-height: 1.2;
-  margin-bottom: 16px;
-  background: linear-gradient(to right, #fff, #94a3b8);
+  line-height: 1.1;
+  font-weight: 800;
+  margin-bottom: 24px;
+  letter-spacing: -1.5px;
+}
+
+/* Efeito de texto gradiente */
+.gradient-text {
+  background: linear-gradient(90deg, #818cf8, #c084fc);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
-.subtitle {
+.hero-description {
   font-size: 1.25rem;
   color: var(--text-secondary);
-  max-width: 600px;
   margin-bottom: 40px;
+  line-height: 1.6;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
-/* =========================================
-   5. Botões e Elementos Interativos
-   ========================================= */
-.cta-button {
-  background-color: var(--primary-color);
-  color: white;
-  padding: 14px 32px;
-  border-radius: 8px;
-  font-size: 1rem;
-  font-weight: 600;
-  border: none;
-  cursor: pointer;
-  transition: transform 0.2s, background-color 0.2s;
-  box-shadow: 0 4px 14px 0 rgba(59, 130, 246, 0.39);
+.hero-buttons {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
 }
 
-.cta-button:hover {
-  background-color: #2563eb;
-  transform: translateY(-2px);
-}
-
-/* =========================================
-   6. Responsividade (Mobile)
-   ========================================= */
+/* --- Responsividade --- */
 @media (max-width: 768px) {
-  .title {
+  .hero-title {
     font-size: 2.5rem;
   }
   
-  .header {
-    flex-direction: column;
-    gap: 20px;
+  .navbar {
+    padding: 1rem;
   }
   
-  .nav-links {
-    margin-top: 10px;
+  .nav-menu a {
+    display: none; /* Esconde links no mobile por simplicidade */
   }
 }
