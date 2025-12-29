@@ -1,103 +1,38 @@
-/* Container que ocupa a tela toda e centraliza o card */
-.login-container {
+:root {
+  --bg-dark: #09090b;       /* Fundo da página */
+  --bg-card: #18181b;       /* Fundo do cartão */
+  --border-color: #27272a;  /* Bordas sutis */
+  --text-primary: #f8fafc;  /* Branco principal */
+  --text-secondary: #a1a1aa;/* Cinza secundário */
+  --accent: #3b82f6;        /* Azul destaque */
+  --danger: #ef4444;        /* Vermelho logout */
+}
+
+/* Reset básico caso não tenha no index.css */
+* { box-sizing: border-box; }
+body { margin: 0; font-family: 'Inter', sans-serif; background: var(--bg-dark); color: var(--text-primary); }
+
+/* --- Layout Principal --- */
+.app-container {
   display: flex;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
   min-height: 100vh;
-  width: 100%;
-  background-color: var(--bg-primary); /* Usa a cor do index.css */
   padding: 20px;
+  background-color: var(--bg-dark);
 }
 
-/* O Cartão de Login */
-.login-card {
-  background-color: var(--bg-secondary); /* Cinza escuro */
-  width: 100%;
-  max-width: 400px;
-  padding: 40px 30px;
+/* --- Estilo dos Cards (Login e Dashboard) --- */
+.card {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-color);
   border-radius: 16px;
-  border: 1px solid #27272a;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-  text-align: center;
-}
-
-/* Cabeçalho do Card (Logo + Nome) */
-.card-header {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin-bottom: 30px;
-}
-
-.app-logo {
-  width: 60px;
-  height: 60px;
-  margin-bottom: 16px;
-  object-fit: contain;
-}
-
-.card-header h2 {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: var(--text-primary);
-}
-
-/* Textos de instrução */
-.instruction-text {
-  color: var(--text-secondary);
-  margin-bottom: 24px;
-  font-size: 0.95rem;
-  line-height: 1.5;
-}
-
-/* --- Botão do Google --- */
-.google-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
+  padding: 40px;
   width: 100%;
-  background-color: #ffffff;
-  color: #1f1f1f;
-  border: none;
-  border-radius: 8px;
-  padding: 12px;
-  font-size: 1rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: transform 0.2s, box-shadow 0.2s;
-}
-
-.google-btn:hover {
-  background-color: #f8f9fa;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-}
-
-/* --- Área do QR Code --- */
-.qr-box {
-  background-color: white;
-  padding: 15px;
-  border-radius: 12px;
-  display: inline-block;
-  margin-bottom: 20px;
-}
-
-.qr-image {
-  width: 200px;
-  height: 200px;
-  display: block;
-}
-
-.loading-text {
-  font-size: 0.85rem;
-  color: var(--accent-color);
-  animation: pulse 2s infinite;
-}
-
-/* Animação suave de entrada */
-.fade-in {
-  animation: fadeIn 0.5s ease-in-out;
+  max-width: 420px;
+  text-align: center;
+  box-shadow: 0 10px 40px -10px rgba(0,0,0,0.5);
+  animation: fadeIn 0.5s ease-out;
 }
 
 @keyframes fadeIn {
@@ -105,8 +40,141 @@
   to { opacity: 1; transform: translateY(0); }
 }
 
-@keyframes pulse {
-  0% { opacity: 0.6; }
-  50% { opacity: 1; }
-  100% { opacity: 0.6; }
+/* Cabeçalho do Card */
+.card-header {
+  margin-bottom: 30px;
+}
+
+.app-logo {
+  width: 64px;
+  height: 64px;
+  object-fit: contain;
+  margin-bottom: 16px;
+}
+
+.title {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.subtitle {
+  margin: 8px 0 0;
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+}
+
+/* --- Botão Google --- */
+.google-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  width: 100%;
+  background-color: white;
+  color: #1f1f1f;
+  border: none;
+  padding: 14px;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.google-btn:hover {
+  background-color: #f8f9fa;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+/* --- Badge de Usuário --- */
+.user-badge {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border-color);
+  padding: 8px 16px;
+  border-radius: 20px;
+  display: inline-block;
+  margin-top: 10px;
+  font-size: 0.85rem;
+}
+
+.user-label { color: var(--text-secondary); margin-right: 5px; }
+.user-email { color: var(--text-primary); font-weight: 600; }
+
+/* --- Área de Status / QR --- */
+.status-area {
+  margin: 30px 0;
+  min-height: 250px; /* Evita pulo de layout */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.qr-frame {
+  background: white;
+  padding: 15px;
+  border-radius: 12px;
+  display: inline-block;
+}
+
+.status-text {
+  margin-bottom: 15px;
+  font-size: 1.1rem;
+  color: var(--accent);
+  font-weight: 500;
+}
+
+/* Loading Spinner simples */
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid rgba(255,255,255,0.1);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 80px auto;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* --- Estado de Sucesso --- */
+.status-success {
+  color: #22c55e;
+}
+.icon-success {
+  font-size: 3rem;
+  margin-bottom: 10px;
+}
+.status-success h2 { margin: 0; color: #22c55e; }
+.status-success p { color: var(--text-secondary); margin-top: 5px; }
+
+/* --- Botão Logout --- */
+.logout-btn {
+  background: transparent;
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  padding: 10px 20px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.2s;
+  width: 100%;
+}
+
+.logout-btn:hover {
+  border-color: var(--danger);
+  color: var(--danger);
+}
+
+/* --- Erro --- */
+.error-box {
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  color: var(--danger);
+  padding: 10px;
+  border-radius: 6px;
+  margin-top: 20px;
+  font-size: 0.9rem;
 }
