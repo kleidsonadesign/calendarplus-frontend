@@ -1,81 +1,149 @@
-/* Reset básico para garantir que o layout ocupe a tela toda */
+/* =========================================
+   1. Variáveis e Reset (Configurações Globais)
+   ========================================= */
 :root {
-  font-family: 'Inter', system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
+  --bg-color: #0f172a;       /* Azul muito escuro (quase preto) */
+  --card-bg: #1e293b;        /* Azul um pouco mais claro para cartões */
+  --primary-color: #3b82f6;  /* Azul destaque */
+  --text-main: #f8fafc;      /* Branco gelo para texto principal */
+  --text-secondary: #94a3b8; /* Cinza para textos secundários */
+  --font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
 body {
-  margin: 0;
-  padding: 0;
-  display: flex;
-  place-items: center; /* Isso centraliza vertical e horizontalmente */
-  justify-content: center;
-  min-width: 320px;
+  background-color: var(--bg-color);
+  color: var(--text-main);
+  font-family: var(--font-family);
+  -webkit-font-smoothing: antialiased;
   min-height: 100vh;
-  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); /* Gradiente suave */
+  display: flex;
+  flex-direction: column;
 }
 
-/* O Cartão Central */
-.login-card {
-  background-color: white;
-  padding: 3rem 2rem;
-  border-radius: 16px;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05); /* Sombra elegante */
-  text-align: center;
+/* =========================================
+   2. Layout Principal (Container)
+   ========================================= */
+.app-container {
   width: 100%;
-  max-width: 380px;
-  transition: transform 0.2s;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
 }
 
-.login-card:hover {
-  transform: translateY(-2px); /* Efeito sutil ao passar o mouse */
-}
-
-/* Tipografia */
-h1 {
-  font-size: 1.8rem;
-  color: #1a1a1a;
-  margin-bottom: 0.5rem;
-  font-weight: 700;
-}
-
-p.subtitle {
-  color: #64748b;
-  margin-bottom: 2rem;
-  font-size: 0.95rem;
-}
-
-/* Botão do Google */
-.btn-google {
+/* =========================================
+   3. Cabeçalho (Header) e Logo
+   ========================================= */
+.header {
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 12px;
-  width: 100%;
-  padding: 12px 16px;
-  background-color: white;
-  border: 1px solid #e2e8f0;
-  border-radius: 8px;
-  font-weight: 600;
-  color: #334155;
+  justify-content: space-between;
+  padding: 20px 0;
+  margin-bottom: 60px;
+}
+
+.logo-area {
+  display: flex;
+  align-items: center;
+  gap: 12px; /* Espaço entre o ícone e o nome */
+  font-weight: 700;
+  font-size: 1.5rem;
+  color: var(--text-main);
   cursor: pointer;
-  transition: all 0.2s ease;
-  text-decoration: none; /* Caso seja um link <a> */
+}
+
+/* Configuração Específica para o Calendar.png */
+.logo-img {
+  width: 40px;  /* Tamanho controlado do ícone */
+  height: 40px;
+  object-fit: contain;
+  filter: drop-shadow(0 0 8px rgba(59, 130, 246, 0.5)); /* Brilho sutil */
+}
+
+/* Navegação simples (opcional) */
+.nav-links a {
+  color: var(--text-secondary);
+  text-decoration: none;
+  margin-left: 24px;
+  transition: color 0.3s;
+}
+
+.nav-links a:hover {
+  color: var(--primary-color);
+}
+
+/* =========================================
+   4. Conteúdo Principal (Hero Section)
+   ========================================= */
+.main-content {
+  flex: 1; /* Empurra o rodapé para baixo */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding-bottom: 60px;
+}
+
+.title {
+  font-size: 3.5rem;
+  line-height: 1.2;
+  margin-bottom: 16px;
+  background: linear-gradient(to right, #fff, #94a3b8);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.subtitle {
+  font-size: 1.25rem;
+  color: var(--text-secondary);
+  max-width: 600px;
+  margin-bottom: 40px;
+}
+
+/* =========================================
+   5. Botões e Elementos Interativos
+   ========================================= */
+.cta-button {
+  background-color: var(--primary-color);
+  color: white;
+  padding: 14px 32px;
+  border-radius: 8px;
   font-size: 1rem;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.2s, background-color 0.2s;
+  box-shadow: 0 4px 14px 0 rgba(59, 130, 246, 0.39);
 }
 
-.btn-google:hover {
-  background-color: #f8fafc;
-  border-color: #cbd5e1;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+.cta-button:hover {
+  background-color: #2563eb;
+  transform: translateY(-2px);
 }
 
-/* Rodapé */
-.footer {
-  margin-top: 2.5rem;
-  font-size: 0.75rem;
-  color: #94a3b8;
-  border-top: 1px solid #f1f5f9;
-  padding-top: 1rem;
+/* =========================================
+   6. Responsividade (Mobile)
+   ========================================= */
+@media (max-width: 768px) {
+  .title {
+    font-size: 2.5rem;
+  }
+  
+  .header {
+    flex-direction: column;
+    gap: 20px;
+  }
+  
+  .nav-links {
+    margin-top: 10px;
+  }
 }
