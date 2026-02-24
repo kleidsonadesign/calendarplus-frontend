@@ -3,8 +3,12 @@ import io from 'socket.io-client';
 import axios from 'axios';
 
 // === CONFIGURAÇÃO DO SERVIDOR ===
-// Substituímos o import.meta para garantir compatibilidade com todos os ambientes
-const API_URL = 'http://localhost:3000';
+// @ts-ignore
+const API_URL = import.meta.env.VITE_API_URL || '';
+
+if (!API_URL) {
+  console.error("ERRO CRÍTICO: VITE_API_URL não encontrada!");
+}
 
 const socket = io(API_URL || '', {
   transports: ['websocket', 'polling'] 
@@ -210,7 +214,7 @@ function App() {
 
             {!API_URL && (
               <div className="error-box">
-                  ⚠️ ERRO: API_URL não configurada!
+                  ⚠️ ERRO: VITE_API_URL não configurada!
               </div>
             )}
           </div>
