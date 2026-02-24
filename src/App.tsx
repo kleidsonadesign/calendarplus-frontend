@@ -4,7 +4,7 @@ import axios from 'axios';
 
 // === CONFIGURAÇÃO DO SERVIDOR ===
 // @ts-ignore
-const API_URL = import.meta.env.VITE_API_URL || '';
+const API_URL = (typeof process !== 'undefined' && process.env ? process.env.VITE_API_URL : '') || '';
 
 if (!API_URL) {
   console.error("ERRO CRÍTICO: VITE_API_URL não encontrada!");
@@ -70,14 +70,32 @@ function App() {
       window.location.href = `${API_URL}/auth/google`;
   };
 
-  const handleLogout = async () => {
+  // FUNÇÃO: Sair apenas do WhatsApp
+  const handleLogoutWhatsApp = async () => {
     if (!clientId || !API_URL) return;
-    if (confirm("Deseja realmente desconectar e sair?")) {
+    if (confirm("Deseja desconectar o seu telemóvel? Terá de ler o QR Code novamente para reativar o robô.")) {
+        try {
+            // Atualiza a interface imediatamente para informar o utilizador
+            setStatus('A desconectar e a gerar novo QR Code...');
+            setQrCode('');
+            
+            await axios.post(`${API_URL}/session/whatsapp/logout`, { clientId });
+        } catch (error) {
+            alert("Erro ao tentar desconectar o WhatsApp.");
+        }
+    }
+  };
+
+  // FUNÇÃO: Sair da conta Google (Logout total)
+  const handleLogoutGoogle = async () => {
+    if (!clientId || !API_URL) return;
+    if (confirm("Aviso: Isto irá remover a sua Conta Google do sistema e desativar o robô. Deseja continuar?")) {
         try {
             await axios.post(`${API_URL}/session/logout`, { clientId });
+            // Redireciona para o início e limpa o painel
             window.location.href = '/';
         } catch (error) {
-            alert("Erro ao tentar desconectar.");
+            alert("Erro ao tentar sair da conta Google.");
         }
     }
   };
@@ -167,7 +185,30 @@ function App() {
       font-weight: 600;
       margin-left: 5px;
     }
-    .logout-btn {
+    
+    /* Novos estilos para os botões separados */
+    .button-group {
+      display: flex;
+      gap: 10px;
+      margin-top: 25px;
+      width: 100%;
+    }
+    .logout-wa-btn {
+      flex: 1;
+      background-color: #fff3cd;
+      color: #856404;
+      border: 1px solid #ffeeba;
+      padding: 12px;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+    .logout-wa-btn:hover {
+      background-color: #ffe8a1;
+    }
+    .logout-google-btn {
+      flex: 1;
       background-color: #fce8e6;
       color: #d93025;
       border: none;
@@ -177,7 +218,7 @@ function App() {
       cursor: pointer;
       transition: background-color 0.2s;
     }
-    .logout-btn:hover {
+    .logout-google-btn:hover {
       background-color: #fad2cf;
     }
   `;
@@ -296,9 +337,16 @@ function App() {
               )}
             </div>
 
-            <button onClick={handleLogout} className="logout-btn" style={{ marginTop: '25px', width: '100%' }}>
-              Sair / Desconectar
-            </button>
+            {/* NOVOS BOTÕES SEPARADOS */}
+            <div className="button-group">
+              <button onClick={handleLogoutWhatsApp} className="logout-wa-btn" title="Desconecta apenas o telemóvel para poder ler um novo QR Code">
+                Sair do WhatsApp
+              </button>
+              <button onClick={handleLogoutGoogle} className="logout-google-btn" title="Remove a conta do sistema na íntegra">
+                Sair do Google
+              </button>
+            </div>
+
           </div>
         )}
       </div>
