@@ -3,8 +3,7 @@ import io from 'socket.io-client';
 import axios from 'axios';
 
 // === CONFIGURAÇÃO DO SERVIDOR ===
-// @ts-ignore
-const API_URL = (typeof process !== 'undefined' && process.env ? process.env.VITE_API_URL : '') || '';
+const API_URL = import.meta.env.VITE_API_URL;
 
 if (!API_URL) {
   console.error("ERRO CRÍTICO: VITE_API_URL não encontrada!");
@@ -17,7 +16,7 @@ const socket = io(API_URL || '', {
 function App() {
   const [clientId, setClientId] = useState<string | null>(null);
   const [qrCode, setQrCode] = useState('');
-  const [status, setStatus] = useState('Carregando...');
+  const [status, setStatus] = useState('A carregar...');
    
   // 1. Verifica login do Google
   useEffect(() => {
@@ -34,7 +33,7 @@ function App() {
   useEffect(() => {
     socket.on('qr', (qr: string) => { 
         setQrCode(qr); 
-        setStatus('Aguardando leitura do QR Code...'); 
+        setStatus('A aguardar leitura do QR Code...'); 
     });
      
     socket.on('status', (msg: string) => { 
@@ -52,7 +51,7 @@ function App() {
 
   const iniciarSistema = async (emailId: string) => {
       if (!API_URL) return;
-      setStatus('Conectando ao servidor e gerando QR Code...');
+      setStatus('A conectar ao servidor e a gerar QR Code...');
       socket.emit('join', emailId);
       try {
         await axios.post(`${API_URL}/session/start`, { clientId: emailId });
@@ -102,146 +101,37 @@ function App() {
 
   // --- ESTILOS CSS INJETADOS ---
   const styles = `
-    body {
-      margin: 0;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-      background-color: #f0f2f5;
-      color: #333;
-    }
-    .app-container {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-      padding: 20px;
-      box-sizing: border-box;
-    }
-    .card {
-      background: white;
-      border-radius: 16px;
-      box-shadow: 0 8px 30px rgba(0,0,0,0.08);
-      width: 100%;
-      max-width: 450px;
-      padding: 40px 30px;
-      text-align: center;
-      box-sizing: border-box;
-    }
-    .app-logo {
-      width: 80px;
-      height: 80px;
-      margin-bottom: 15px;
-      object-fit: contain;
-    }
-    .title {
-      margin: 0 0 10px 0;
-      font-size: 24px;
-      color: #111b21;
-    }
-    .subtitle {
-      margin: 0 0 30px 0;
-      color: #54656f;
-      font-size: 15px;
-    }
-    .google-btn {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 12px;
-      width: 100%;
-      padding: 12px;
-      border: 1px solid #dadce0;
-      border-radius: 8px;
-      background: white;
-      color: #3c4043;
-      font-size: 16px;
-      font-weight: 500;
-      cursor: pointer;
-      transition: background-color 0.2s;
-    }
-    .google-btn:hover {
-      background-color: #f8f9fa;
-    }
-    .error-box {
-      margin-top: 20px;
-      padding: 15px;
-      background-color: #fce8e6;
-      color: #d93025;
-      border-radius: 8px;
-      font-size: 14px;
-    }
-    .user-badge {
-      display: inline-block;
-      background-color: #e8f0fe;
-      padding: 8px 16px;
-      border-radius: 20px;
-      margin-bottom: 25px;
-      font-size: 14px;
-    }
-    .user-label {
-      color: #5f6368;
-    }
-    .user-email {
-      color: #1a73e8;
-      font-weight: 600;
-      margin-left: 5px;
-    }
-    
-    /* Novos estilos para os botões separados */
-    .button-group {
-      display: flex;
-      gap: 10px;
-      margin-top: 25px;
-      width: 100%;
-    }
-    .logout-wa-btn {
-      flex: 1;
-      background-color: #fff3cd;
-      color: #856404;
-      border: 1px solid #ffeeba;
-      padding: 12px;
-      border-radius: 8px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: background-color 0.2s;
-    }
-    .logout-wa-btn:hover {
-      background-color: #ffe8a1;
-    }
-    .logout-google-btn {
-      flex: 1;
-      background-color: #fce8e6;
-      color: #d93025;
-      border: none;
-      padding: 12px;
-      border-radius: 8px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: background-color 0.2s;
-    }
-    .logout-google-btn:hover {
-      background-color: #fad2cf;
-    }
+    body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #f0f2f5; color: #333; }
+    .app-container { display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; box-sizing: border-box; }
+    .card { background: white; border-radius: 16px; box-shadow: 0 8px 30px rgba(0,0,0,0.08); width: 100%; max-width: 450px; padding: 40px 30px; text-align: center; box-sizing: border-box; }
+    .title { margin: 0 0 10px 0; font-size: 24px; color: #111b21; }
+    .subtitle { margin: 0 0 30px 0; color: #54656f; font-size: 15px; }
+    .google-btn { display: flex; align-items: center; justify-content: center; gap: 12px; width: 100%; padding: 12px; border: 1px solid #dadce0; border-radius: 8px; background: white; color: #3c4043; font-size: 16px; font-weight: 500; cursor: pointer; transition: background-color 0.2s; }
+    .google-btn:hover { background-color: #f8f9fa; }
+    .error-box { margin-top: 20px; padding: 15px; background-color: #fce8e6; color: #d93025; border-radius: 8px; font-size: 14px; }
+    .user-badge { display: inline-block; background-color: #e8f0fe; padding: 8px 16px; border-radius: 20px; margin-bottom: 25px; font-size: 14px; }
+    .user-label { color: #5f6368; }
+    .user-email { color: #1a73e8; font-weight: 600; margin-left: 5px; }
+    .button-group { display: flex; gap: 10px; margin-top: 25px; width: 100%; }
+    .logout-wa-btn { flex: 1; background-color: #fff3cd; color: #856404; border: 1px solid #ffeeba; padding: 12px; border-radius: 8px; font-weight: 600; cursor: pointer; transition: background-color 0.2s; }
+    .logout-wa-btn:hover { background-color: #ffe8a1; }
+    .logout-google-btn { flex: 1; background-color: #fce8e6; color: #d93025; border: none; padding: 12px; border-radius: 8px; font-weight: 600; cursor: pointer; transition: background-color 0.2s; }
+    .logout-google-btn:hover { background-color: #fad2cf; }
   `;
-
-  // --- RENDERIZAÇÃO ---
 
   return (
     <>
       <style>{styles}</style>
       <div className="app-container">
-        
-        {/* TELA DE LOGIN */}
         {!clientId ? (
           <div className="card login-card">
             <div className="card-header">
-              {/* Fallback de imagem caso o /Calendar.png não exista */}
               <div style={{ fontSize: '64px', marginBottom: '10px' }}>📅</div>
               <h1 className="title">Calendario +</h1>
               <p className="subtitle">Automação de agendamentos com IA</p>
             </div>
 
             <button onClick={loginComGoogle} className="google-btn">
-              {/* Ícone do Google SVG */}
               <svg className="google-icon" viewBox="0 0 24 24" width="20" height="20">
                 <g transform="matrix(1, 0, 0, 1, 27.009001, -39.238998)">
                   <path fill="#4285F4" d="M -3.264 51.509 C -3.264 50.719 -3.334 49.969 -3.454 49.239 L -14.754 49.239 L -14.754 53.749 L -8.284 53.749 C -8.574 55.229 -9.424 56.479 -10.684 57.329 L -10.684 60.329 L -6.824 60.329 C -4.564 58.239 -3.264 55.159 -3.264 51.509 Z" />
@@ -259,10 +149,7 @@ function App() {
               </div>
             )}
           </div>
-
         ) : (
-
-          /* TELA DE DASHBOARD / QR CODE */
           <div className="card dashboard-card">
             <div className="card-header">
               <h1 className="title">Painel de Controlo</h1>
@@ -281,17 +168,7 @@ function App() {
                 </div>
               ) : (
                 <div className="qr-section" style={{ display: 'flex', flexDirection: 'column', gap: '20px', alignItems: 'center' }}>
-                  
-                  {/* CAIXA DE INSTRUÇÕES INTUITIVAS */}
-                  <div className="instructions-box" style={{ 
-                    backgroundColor: '#f0f4f8', 
-                    padding: '20px', 
-                    borderRadius: '12px', 
-                    borderLeft: '5px solid #25D366', 
-                    textAlign: 'left', 
-                    width: '100%',
-                    boxSizing: 'border-box'
-                  }}>
+                  <div className="instructions-box" style={{ backgroundColor: '#f0f4f8', padding: '20px', borderRadius: '12px', borderLeft: '5px solid #25D366', textAlign: 'left', width: '100%', boxSizing: 'border-box' }}>
                     <h3 style={{ marginTop: 0, color: '#111b21', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '16px' }}>
                       📱 Como ligar o seu WhatsApp
                     </h3>
@@ -308,25 +185,9 @@ function App() {
                     {status}
                   </p>
                   
-                  {/* ÁREA DO QR CODE */}
-                  <div className="qr-frame" style={{ 
-                    padding: '15px', 
-                    background: 'white', 
-                    borderRadius: '16px', 
-                    boxShadow: '0 4px 15px rgba(0,0,0,0.05)',
-                    display: 'flex',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    minHeight: '220px',
-                    minWidth: '220px',
-                    border: '1px solid #e9edef'
-                  }}>
+                  <div className="qr-frame" style={{ padding: '15px', background: 'white', borderRadius: '16px', boxShadow: '0 4px 15px rgba(0,0,0,0.05)', display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '220px', minWidth: '220px', border: '1px solid #e9edef' }}>
                     {qrCode ? (
-                      <img 
-                        src={`https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(qrCode)}`} 
-                        alt="QR Code WhatsApp" 
-                        style={{ width: '220px', height: '220px', display: 'block' }}
-                      />
+                      <img src={`https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(qrCode)}`} alt="QR Code WhatsApp" style={{ width: '220px', height: '220px', display: 'block' }} />
                     ) : (
                       <div className="loading-spinner" style={{ color: '#888', fontWeight: '500', fontSize: '14px' }}>
                         A gerar código de acesso...
@@ -337,16 +198,14 @@ function App() {
               )}
             </div>
 
-            {/* NOVOS BOTÕES SEPARADOS */}
             <div className="button-group">
               <button onClick={handleLogoutWhatsApp} className="logout-wa-btn" title="Desconecta apenas o telemóvel para poder ler um novo QR Code">
                 Sair do WhatsApp
               </button>
-              <button onClick={handleLogoutGoogle} className="logout-google-btn" title="Remove a conta do sistema na íntegra">  
-                Sair de tudo
+              <button onClick={handleLogoutGoogle} className="logout-google-btn" title="Remove a conta do sistema na íntegra">
+                Sair do Google
               </button>
             </div>
-
           </div>
         )}
       </div>
