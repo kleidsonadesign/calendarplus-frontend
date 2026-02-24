@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import io from 'socket.io-client';
 import axios from 'axios';
 
@@ -11,7 +11,7 @@ const socket = io(API_URL || '', {
 });
 
 function App() {
-  const [clientId, setClientId] = useState(null);
+  const [clientId, setClientId] = useState<string | null>(null);
   const [qrCode, setQrCode] = useState('');
   const [status, setStatus] = useState('Carregando...');
    
@@ -28,12 +28,12 @@ function App() {
 
   // 2. Ouve eventos do WebSocket
   useEffect(() => {
-    socket.on('qr', (qr) => { 
+    socket.on('qr', (qr: string) => { 
         setQrCode(qr); 
         setStatus('Aguardando leitura do QR Code...'); 
     });
      
-    socket.on('status', (msg) => { 
+    socket.on('status', (msg: string) => { 
       if (msg === 'connected') { 
         setStatus('✅ Conectado com Sucesso!'); 
         setQrCode(''); 
@@ -46,7 +46,7 @@ function App() {
     };
   }, []);
 
-  const iniciarSistema = async (emailId) => {
+  const iniciarSistema = async (emailId: string) => {
       if (!API_URL) return;
       setStatus('Conectando ao servidor e gerando QR Code...');
       socket.emit('join', emailId);
