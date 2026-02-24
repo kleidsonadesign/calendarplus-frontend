@@ -342,8 +342,8 @@ function App() {
               <button onClick={handleLogoutWhatsApp} className="logout-wa-btn" title="Desconecta apenas o telemóvel para poder ler um novo QR Code">
                 Sair do WhatsApp
               </button>
-              <button onClick={handleLogoutGoogle} className="logout-google-btn" title="Remove a conta do sistema na íntegra">
-                Sair do Google
+              <button onClick={handleLogoutGoogle} className="logout-google-btn" title="Remove a conta do sistema na íntegra">  
+                Sair de tudo
               </button>
             </div>
 
