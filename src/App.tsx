@@ -200,18 +200,16 @@ function App() {
     
     .side-card { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.04); margin-bottom: 20px; text-align: left; border: 1px solid #e9edef; }
     
-    .app-logo { max-width: 200px; height: auto; margin: 0 auto; display: block; }
     .app-logo-login { max-width: 80px; height: auto; margin: 0 auto 10px auto; display: block; }
-    
-    /* Logo nas colunas laterais */
-    .side-logo { max-width: 140px; height: auto; margin: 0 auto 20px auto; display: block; }
+
+    /* Estilo para a única logo do dashboard (coluna direita) */
+    .side-logo { max-width: 180px; height: auto; margin: 0 auto 20px auto; display: block; }
 
     .developer-footer { margin-top: auto; padding-top: 40px; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; }
     .dev-logo { max-width: 110px; height: auto; opacity: 0.6; transition: opacity 0.3s ease; }
     .dev-logo:hover { opacity: 1; }
     .dev-text { font-size: 11px; color: #888; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; font-weight: 600; }
 
-    .title { margin: 0 0 10px 0; font-size: 24px; color: #111b21; font-weight: 700; }
     .subtitle { margin: 0 0 30px 0; color: #54656f; font-size: 15px; }
     
     .google-btn { display: flex; align-items: center; justify-content: center; gap: 12px; width: 100%; padding: 12px; border: 1px solid #dadce0; border-radius: 8px; background: white; color: #3c4043; font-size: 16px; font-weight: 500; cursor: pointer; transition: background-color 0.2s; }
@@ -219,7 +217,7 @@ function App() {
     
     .user-badge-card { display: flex; justify-content: center; align-items: center; gap: 8px; padding: 15px; border-radius: 8px; background-color: white; border: 1px solid #e9edef; font-size: 14px; margin-bottom: 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.02); }
     .user-label { color: #5f6368; font-weight: 500;}
-    .user-email { color: #1a73e8; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .user-email { color: #1a73e8; font-weight: 600; }
 
     .toggle-section { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; }
     .toggle-info { flex: 1; padding-right: 15px; }
@@ -341,11 +339,9 @@ function App() {
             {/* COLUNA CENTRAL */}
             <div className="center-column">
               <div className="card main-card">
-                <div className="card-header" style={{ marginBottom: '30px' }}>
-                  <img src="/calendarplus.png" alt="Calendar Plus Dashboard" className="app-logo" />
-                </div>
-
-                <div className="status-area" style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                {/* LOGO REMOVIDA DAQUI PARA EVITAR DUPLICIDADE */}
+                
+                <div className="status-area" style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', paddingTop: '40px' }}>
                   {status.includes('✅') ? (
                     <div className="status-success" style={{ marginTop: '50px' }}>
                       <div className="icon-success" style={{ fontSize: '64px', color: '#25D366', marginBottom: '20px' }}>✔</div>
@@ -394,12 +390,12 @@ function App() {
 
             {/* COLUNA DIREITA */}
             <div className="right-column">
-              {/* LOGO INSERIDA ACIMA DO UTILIZADOR */}
+              {/* ÚNICA LOGO DO DASHBOARD: Posicionada acima do nome do utilizador */}
               <img src="/calendarplus.png" alt="Calendar Plus" className="side-logo" />
               
               <div className="user-badge-card">
                 <span className="user-label">Utilizador:</span>
-                <span className="user-email" title={clientId || ''}>{clientId}</span>
+                <span className="user-email">{clientId}</span>
               </div>
               
               <button onClick={handleLogoutGoogle} className="logout-google-btn" title="Remove a conta do sistema na íntegra">
