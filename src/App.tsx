@@ -287,7 +287,7 @@ function App() {
               <div className="side-card">
                 <div className="toggle-section">
                   <div className="toggle-info">
-                    <h3 className="toggle-title">🤖 Atendimento Automático (IA)</h3>
+                    <h3 className="toggle-title"> Atendimento Automático (IA)</h3>
                     <p className="toggle-desc">
                       {isAiEnabled 
                         ? 'A IA está ativada e responderá às mensagens.' 
@@ -307,7 +307,7 @@ function App() {
               </div>
 
               <div className="side-card">
-                <h3 className="hours-title">⏰ Horário de Atendimento da IA</h3>
+                <h3 className="hours-title"> Horário de Atendimento da IA</h3>
                 <div className="hours-controls">
                   <div className="hour-input-group">
                     <label>Das</label>
@@ -341,7 +341,7 @@ function App() {
               <div className="card main-card">
                 <div className="card-header" style={{ marginBottom: '30px' }}>
                   {/* LOGO NO LUGAR DO NOME "PAINEL DE CONTROLO" */}
-                  <img src="/calendarplus.png" alt="Calendar Plus Dashboard" className="app-logo" />
+                  <img src="/calendar.png" alt="Calendar Plus Dashboard" className="app-logo" />
                 </div>
 
                 <div className="status-area" style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
