@@ -170,7 +170,6 @@ function App() {
   const handleLogoutGoogle = async () => {
     if (!clientId || !API_URL) return;
 
-    // AVISO ATUALIZADO PARA INFORMAR QUE OS DADOS SÃO GUARDADOS
     if (confirm("Isto irá desconectar a sua Conta Google e o WhatsApp, mas os seus horários e configurações da IA serão guardados. Deseja continuar?")) {
         try {
             await axios.post(`${API_URL}/session/logout`, { clientId });
@@ -187,13 +186,10 @@ function App() {
     
     .app-wrapper { display: flex; justify-content: center; min-height: 100vh; padding: 40px 20px; box-sizing: border-box; }
     
-    /* Layout Login */
     .login-container { display: flex; justify-content: center; align-items: center; width: 100%; }
     
-    /* Layout Dashboard - 3 Colunas */
     .dashboard-layout { display: grid; grid-template-columns: 320px 480px 320px; gap: 30px; justify-content: center; align-items: start; width: 100%; max-width: 1250px; }
     
-    /* Responsive Dashboard */
     @media (max-width: 1200px) {
       .dashboard-layout { grid-template-columns: 1fr; max-width: 500px; }
     }
@@ -202,13 +198,14 @@ function App() {
     .login-card { width: 100%; max-width: 450px; padding: 40px 30px; }
     .main-card { padding: 40px 30px; min-height: 600px; display: flex; flex-direction: column; }
     
-    /* Side Cards (Esquerda e Direita) */
     .side-card { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.04); margin-bottom: 20px; text-align: left; border: 1px solid #e9edef; }
     
-    /* Imagens de Logo */
     .app-logo { max-width: 200px; height: auto; margin: 0 auto; display: block; }
-    /* ATUALIZAÇÃO: O tamanho da logo no login foi reduzido para 80px */
     .app-logo-login { max-width: 80px; height: auto; margin: 0 auto 10px auto; display: block; }
+    
+    /* Logo nas colunas laterais */
+    .side-logo { max-width: 140px; height: auto; margin: 0 auto 20px auto; display: block; }
+
     .developer-footer { margin-top: auto; padding-top: 40px; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; }
     .dev-logo { max-width: 110px; height: auto; opacity: 0.6; transition: opacity 0.3s ease; }
     .dev-logo:hover { opacity: 1; }
@@ -222,15 +219,13 @@ function App() {
     
     .user-badge-card { display: flex; justify-content: center; align-items: center; gap: 8px; padding: 15px; border-radius: 8px; background-color: white; border: 1px solid #e9edef; font-size: 14px; margin-bottom: 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.02); }
     .user-label { color: #5f6368; font-weight: 500;}
-    .user-email { color: #1a73e8; font-weight: 600; }
+    .user-email { color: #1a73e8; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
-    /* ESTILOS DA SEÇÃO DO INTERRUPTOR DA IA */
     .toggle-section { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; }
     .toggle-info { flex: 1; padding-right: 15px; }
     .toggle-title { font-size: 14px; font-weight: 600; color: #111b21; margin: 0 0 5px 0; display: flex; align-items: center; gap: 8px; }
     .toggle-desc { font-size: 12px; color: #54656f; margin: 0; line-height: 1.4; }
     
-    /* CSS DO BOTÃO SWITCH */
     .switch { position: relative; display: inline-block; width: 44px; height: 24px; flex-shrink: 0; }
     .switch input { opacity: 0; width: 0; height: 0; }
     .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 24px; }
@@ -263,7 +258,6 @@ function App() {
           <div className="login-container">
             <div className="card login-card">
               <div className="card-header">
-                {/* LOGO NA TELA DE LOGIN TAMBÉM */}
                 <img src="/calendarplus.png" alt="Calendar Plus" className="app-logo-login" />
                 <p className="subtitle">Automação de agendamentos com IA</p>
               </div>
@@ -337,20 +331,17 @@ function App() {
                 </button>
               </div>
 
-              {/* BOTÃO DO WHATSAPP DE VOLTA À COLUNA ESQUERDA */}
               {status.includes('✅') && (
                 <button onClick={handleLogoutWhatsApp} className="logout-wa-btn" title="Desconecta apenas o telemóvel para poder ler um novo QR Code">
                   Sair do WhatsApp
                 </button>
               )}
-
             </div>
 
             {/* COLUNA CENTRAL */}
             <div className="center-column">
               <div className="card main-card">
                 <div className="card-header" style={{ marginBottom: '30px' }}>
-                  {/* LOGO NO LUGAR DO NOME "PAINEL DE CONTROLO" */}
                   <img src="/calendarplus.png" alt="Calendar Plus Dashboard" className="app-logo" />
                 </div>
 
@@ -393,7 +384,6 @@ function App() {
                   )}
                 </div>
 
-                {/* LOGO DA DESENVOLVEDORA NO RODAPÉ */}
                 <div className="developer-footer">
                   <span className="dev-text">Desenvolvido por</span>
                   <img src="/korven.png" alt="Korven Lab" className="dev-logo" />
@@ -404,9 +394,12 @@ function App() {
 
             {/* COLUNA DIREITA */}
             <div className="right-column">
+              {/* LOGO INSERIDA ACIMA DO UTILIZADOR */}
+              <img src="/calendarplus.png" alt="Calendar Plus" className="side-logo" />
+              
               <div className="user-badge-card">
                 <span className="user-label">Utilizador:</span>
-                <span className="user-email">{clientId}</span>
+                <span className="user-email" title={clientId || ''}>{clientId}</span>
               </div>
               
               <button onClick={handleLogoutGoogle} className="logout-google-btn" title="Remove a conta do sistema na íntegra">
