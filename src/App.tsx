@@ -249,7 +249,7 @@ function App() {
     .logout-google-btn { width: 100%; background-color: #fce8e6; color: #d93025; border: none; padding: 12px; border-radius: 8px; font-weight: 600; cursor: pointer; transition: background-color 0.2s; margin-bottom: 15px; }
     .logout-google-btn:hover { background-color: #fad2cf; }
     
-    .logout-wa-btn { width: 100%; background-color: #fff3cd; color: #856404; border: 1px solid #ffeeba; padding: 12px; border-radius: 8px; font-weight: 600; cursor: pointer; transition: background-color 0.2s; }
+    .logout-wa-btn { width: 100%; background-color: #fff3cd; color: #856404; border: 1px solid #ffeeba; padding: 12px; border-radius: 8px; font-weight: 600; cursor: pointer; transition: background-color 0.2s; margin-top: 10px; }
     .logout-wa-btn:hover { background-color: #ffe8a1; }
   `;
 
@@ -287,7 +287,7 @@ function App() {
               <div className="side-card">
                 <div className="toggle-section">
                   <div className="toggle-info">
-                    <h3 className="toggle-title"> Atendimento Automático (IA)</h3>
+                    <h3 className="toggle-title">🤖 Atendimento Automático (IA)</h3>
                     <p className="toggle-desc">
                       {isAiEnabled 
                         ? 'A IA está ativada e responderá às mensagens.' 
@@ -307,7 +307,7 @@ function App() {
               </div>
 
               <div className="side-card">
-                <h3 className="hours-title"> Horário de Atendimento da IA</h3>
+                <h3 className="hours-title">⏰ Horário de Atendimento da IA</h3>
                 <div className="hours-controls">
                   <div className="hour-input-group">
                     <label>Das</label>
@@ -334,6 +334,14 @@ function App() {
                   {isSaving ? 'A guardar...' : 'Guardar Horário'}
                 </button>
               </div>
+
+              {/* BOTÃO DO WHATSAPP DE VOLTA À COLUNA ESQUERDA */}
+              {status.includes('✅') && (
+                <button onClick={handleLogoutWhatsApp} className="logout-wa-btn" title="Desconecta apenas o telemóvel para poder ler um novo QR Code">
+                  Sair do WhatsApp
+                </button>
+              )}
+
             </div>
 
             {/* COLUNA CENTRAL */}
@@ -341,7 +349,7 @@ function App() {
               <div className="card main-card">
                 <div className="card-header" style={{ marginBottom: '30px' }}>
                   {/* LOGO NO LUGAR DO NOME "PAINEL DE CONTROLO" */}
-                  <img src="/calendar.png" alt="Calendar Plus Dashboard" className="app-logo" />
+                  <img src="/calendarplus.png" alt="Calendar Plus Dashboard" className="app-logo" />
                 </div>
 
                 <div className="status-area" style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
@@ -402,12 +410,6 @@ function App() {
               <button onClick={handleLogoutGoogle} className="logout-google-btn" title="Remove a conta do sistema na íntegra">
                 Sair do Google
               </button>
-
-              {status.includes('✅') && (
-                <button onClick={handleLogoutWhatsApp} className="logout-wa-btn" title="Desconecta apenas o telemóvel para poder ler um novo QR Code">
-                  Sair do WhatsApp
-                </button>
-              )}
             </div>
 
           </div>
