@@ -3,8 +3,7 @@ import io from 'socket.io-client';
 import axios from 'axios';
 
 // === CONFIGURAÇÃO DO SERVIDOR ===
-// @ts-ignore
-const API_URL = (typeof process !== 'undefined' && process.env ? process.env.VITE_API_URL : '') || '';
+const API_URL = import.meta.env.VITE_API_URL;
 
 if (!API_URL) {
   console.error("ERRO CRÍTICO: VITE_API_URL não encontrada!");
@@ -19,11 +18,12 @@ function App() {
   const [qrCode, setQrCode] = useState('');
   const [status, setStatus] = useState('A carregar...');
   
-  // FEATURE: Estados para Horário de Funcionamento
+  // Estados para o horário de funcionamento
   const [startTime, setStartTime] = useState('08:00');
   const [endTime, setEndTime] = useState('18:00');
   const [isSaving, setIsSaving] = useState(false);
    
+  // 1. Verifica login do Google
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const idFromUrl = params.get('clientId');
@@ -31,10 +31,11 @@ function App() {
     if (idFromUrl) {
       setClientId(idFromUrl);
       iniciarSistema(idFromUrl);
-      carregarConfiguracoes(idFromUrl); // Carrega os horários da IA
+      fetchHours(idFromUrl);
     }
   }, []);
 
+  // 2. Ouve eventos do WebSocket
   useEffect(() => {
     socket.on('qr', (qr: string) => { 
         setQrCode(qr); 
@@ -56,42 +57,15 @@ function App() {
 
   const iniciarSistema = async (emailId: string) => {
       if (!API_URL) return;
+
       setStatus('A conectar ao servidor e a gerar QR Code...');
       socket.emit('join', emailId);
+
       try {
         await axios.post(`${API_URL}/session/start`, { clientId: emailId });
       } catch (error) {
         console.error("Erro ao conectar:", error);
         setStatus('Erro ao conectar com a API.');
-      }
-  };
-
-  // FEATURE: Buscar e Gravar Horários na Base de Dados
-  const carregarConfiguracoes = async (emailId: string) => {
-      try {
-          const res = await axios.get(`${API_URL}/session/config/${emailId}`);
-          if (res.data?.operatingHours) {
-              setStartTime(res.data.operatingHours.start);
-              setEndTime(res.data.operatingHours.end);
-          }
-      } catch (error) {
-          console.error("Erro ao carregar horários", error);
-      }
-  };
-
-  const salvarHorarios = async () => {
-      if (!clientId || !API_URL) return;
-      setIsSaving(true);
-      try {
-          await axios.post(`${API_URL}/session/config`, { 
-              clientId, 
-              operatingHours: { start: startTime, end: endTime } 
-          });
-          alert("Horários de funcionamento guardados com sucesso!");
-      } catch (error) {
-          alert("Erro ao guardar os horários.");
-      } finally {
-          setIsSaving(false);
       }
   };
 
@@ -103,12 +77,49 @@ function App() {
       window.location.href = `${API_URL}/auth/google`;
   };
 
+  // BUSCAR HORÁRIOS SALVOS
+  const fetchHours = async (id: string) => {
+      if (!API_URL) return;
+      try {
+          const response = await axios.get(`${API_URL}/session/${id}/hours`);
+          if (response.data && response.data.operatingHours) {
+              setStartTime(response.data.operatingHours.start || '08:00');
+              setEndTime(response.data.operatingHours.end || '18:00');
+          }
+      } catch (error) {
+          console.error("Erro ao buscar horários:", error);
+      }
+  };
+
+  // SALVAR HORÁRIOS
+  const saveHours = async () => {
+      if (!clientId || !API_URL) return;
+      setIsSaving(true);
+      try {
+          await axios.post(`${API_URL}/session/hours`, {
+              clientId,
+              startTime,
+              endTime
+          });
+          alert("Horário guardado com sucesso!");
+      } catch (error) {
+          console.error("Erro ao guardar horários:", error);
+          alert("Erro ao guardar horário.");
+      } finally {
+          setIsSaving(false);
+      }
+  };
+
+  // FUNÇÃO: Sair apenas do WhatsApp
   const handleLogoutWhatsApp = async () => {
     if (!clientId || !API_URL) return;
+
     if (confirm("Deseja desconectar o seu telemóvel? Terá de ler o QR Code novamente para reativar o robô.")) {
         try {
+            // Atualiza a interface imediatamente para informar o utilizador
             setStatus('A desconectar e a gerar novo QR Code...');
             setQrCode('');
+            
             await axios.post(`${API_URL}/session/whatsapp/logout`, { clientId });
         } catch (error) {
             alert("Erro ao tentar desconectar o WhatsApp.");
@@ -116,11 +127,14 @@ function App() {
     }
   };
 
+  // FUNÇÃO: Sair da conta Google (Logout total)
   const handleLogoutGoogle = async () => {
     if (!clientId || !API_URL) return;
+
     if (confirm("Aviso: Isto irá remover a sua Conta Google do sistema e desativar o robô. Deseja continuar?")) {
         try {
             await axios.post(`${API_URL}/session/logout`, { clientId });
+            // Redireciona para o início e limpa o painel
             window.location.href = '/';
         } catch (error) {
             alert("Erro ao tentar sair da conta Google.");
@@ -141,23 +155,22 @@ function App() {
     .user-badge { display: inline-block; background-color: #e8f0fe; padding: 8px 16px; border-radius: 20px; margin-bottom: 25px; font-size: 14px; }
     .user-label { color: #5f6368; }
     .user-email { color: #1a73e8; font-weight: 600; margin-left: 5px; }
+    
+    .hours-section { background-color: #fff; border: 1px solid #e9edef; border-radius: 12px; padding: 20px; margin-top: 20px; text-align: left; }
+    .hours-title { font-size: 15px; font-weight: 600; color: #111b21; margin: 0 0 15px 0; display: flex; align-items: center; gap: 8px; }
+    .hours-controls { display: flex; gap: 15px; align-items: center; margin-bottom: 15px; }
+    .hour-input-group { display: flex; flex-direction: column; gap: 5px; flex: 1; }
+    .hour-input-group label { font-size: 13px; color: #54656f; }
+    .hour-input-group input { padding: 10px; border: 1px solid #dadce0; border-radius: 8px; font-family: inherit; font-size: 14px; color: #111b21; }
+    .save-hours-btn { background-color: #1a73e8; color: white; border: none; padding: 10px 15px; border-radius: 8px; font-weight: 600; cursor: pointer; width: 100%; transition: background-color 0.2s; }
+    .save-hours-btn:hover { background-color: #1557b0; }
+    .save-hours-btn:disabled { background-color: #a8c7fa; cursor: not-allowed; }
+
     .button-group { display: flex; gap: 10px; margin-top: 25px; width: 100%; }
     .logout-wa-btn { flex: 1; background-color: #fff3cd; color: #856404; border: 1px solid #ffeeba; padding: 12px; border-radius: 8px; font-weight: 600; cursor: pointer; transition: background-color 0.2s; }
     .logout-wa-btn:hover { background-color: #ffe8a1; }
     .logout-google-btn { flex: 1; background-color: #fce8e6; color: #d93025; border: none; padding: 12px; border-radius: 8px; font-weight: 600; cursor: pointer; transition: background-color 0.2s; }
     .logout-google-btn:hover { background-color: #fad2cf; }
-    
-    /* Novos estilos para Configuração de Horários */
-    .config-box { margin-top: 25px; padding: 15px; border: 1px solid #e9edef; border-radius: 12px; background-color: #fafafa; text-align: left; }
-    .config-title { font-size: 15px; font-weight: 600; color: #111b21; margin-bottom: 12px; display: flex; align-items: center; gap: 6px; }
-    .time-inputs { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
-    .time-field { display: flex; flex-direction: column; gap: 4px; flex: 1; }
-    .time-field label { font-size: 12px; color: #54656f; font-weight: 500; }
-    .time-field input { padding: 8px 12px; border: 1px solid #ccc; border-radius: 6px; font-size: 14px; color: #333; outline: none; }
-    .time-field input:focus { border-color: #25D366; }
-    .save-btn { width: 100%; background-color: #25D366; color: white; border: none; padding: 10px; border-radius: 8px; font-weight: 600; cursor: pointer; transition: background-color 0.2s; }
-    .save-btn:hover { background-color: #20b858; }
-    .save-btn:disabled { background-color: #8edfae; cursor: not-allowed; }
   `;
 
   return (
@@ -239,21 +252,20 @@ function App() {
               )}
             </div>
 
-            {/* FEATURE: Painel de Configuração de Horários da IA */}
-            <div className="config-box">
-              <div className="config-title">⏰ Horário de Atendimento da IA</div>
-              <div className="time-inputs">
-                <div className="time-field">
-                  <label>Início</label>
+            {/* SEÇÃO DE HORÁRIO DE FUNCIONAMENTO */}
+            <div className="hours-section">
+              <h3 className="hours-title">⏰ Horário de Atendimento da IA</h3>
+              <div className="hours-controls">
+                <div className="hour-input-group">
+                  <label>Das</label>
                   <input 
                     type="time" 
                     value={startTime} 
                     onChange={(e) => setStartTime(e.target.value)} 
                   />
                 </div>
-                <div style={{ color: '#888', fontWeight: 'bold' }}>-</div>
-                <div className="time-field">
-                  <label>Fim</label>
+                <div className="hour-input-group">
+                  <label>Até às</label>
                   <input 
                     type="time" 
                     value={endTime} 
@@ -262,8 +274,8 @@ function App() {
                 </div>
               </div>
               <button 
-                className="save-btn" 
-                onClick={salvarHorarios}
+                className="save-hours-btn" 
+                onClick={saveHours}
                 disabled={isSaving}
               >
                 {isSaving ? 'A guardar...' : 'Guardar Horário'}
