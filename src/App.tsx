@@ -3,7 +3,8 @@ import io from 'socket.io-client';
 import axios from 'axios';
 
 // === CONFIGURAÇÃO DO SERVIDOR ===
-const API_URL = import.meta.env.VITE_API_URL;
+// @ts-ignore
+const API_URL = (typeof process !== 'undefined' && process.env ? process.env.VITE_API_URL : '') || '';
 
 if (!API_URL) {
   console.error("ERRO CRÍTICO: VITE_API_URL não encontrada!");
@@ -17,8 +18,12 @@ function App() {
   const [clientId, setClientId] = useState<string | null>(null);
   const [qrCode, setQrCode] = useState('');
   const [status, setStatus] = useState('A carregar...');
+  
+  // FEATURE: Estados para Horário de Funcionamento
+  const [startTime, setStartTime] = useState('08:00');
+  const [endTime, setEndTime] = useState('18:00');
+  const [isSaving, setIsSaving] = useState(false);
    
-  // 1. Verifica login do Google
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const idFromUrl = params.get('clientId');
@@ -26,10 +31,10 @@ function App() {
     if (idFromUrl) {
       setClientId(idFromUrl);
       iniciarSistema(idFromUrl);
+      carregarConfiguracoes(idFromUrl); // Carrega os horários da IA
     }
   }, []);
 
-  // 2. Ouve eventos do WebSocket
   useEffect(() => {
     socket.on('qr', (qr: string) => { 
         setQrCode(qr); 
@@ -61,6 +66,35 @@ function App() {
       }
   };
 
+  // FEATURE: Buscar e Gravar Horários na Base de Dados
+  const carregarConfiguracoes = async (emailId: string) => {
+      try {
+          const res = await axios.get(`${API_URL}/session/config/${emailId}`);
+          if (res.data?.operatingHours) {
+              setStartTime(res.data.operatingHours.start);
+              setEndTime(res.data.operatingHours.end);
+          }
+      } catch (error) {
+          console.error("Erro ao carregar horários", error);
+      }
+  };
+
+  const salvarHorarios = async () => {
+      if (!clientId || !API_URL) return;
+      setIsSaving(true);
+      try {
+          await axios.post(`${API_URL}/session/config`, { 
+              clientId, 
+              operatingHours: { start: startTime, end: endTime } 
+          });
+          alert("Horários de funcionamento guardados com sucesso!");
+      } catch (error) {
+          alert("Erro ao guardar os horários.");
+      } finally {
+          setIsSaving(false);
+      }
+  };
+
   const loginComGoogle = () => {
       if (!API_URL) {
           alert("Erro de configuração: URL da API não definida.");
@@ -69,15 +103,12 @@ function App() {
       window.location.href = `${API_URL}/auth/google`;
   };
 
-  // FUNÇÃO: Sair apenas do WhatsApp
   const handleLogoutWhatsApp = async () => {
     if (!clientId || !API_URL) return;
     if (confirm("Deseja desconectar o seu telemóvel? Terá de ler o QR Code novamente para reativar o robô.")) {
         try {
-            // Atualiza a interface imediatamente para informar o utilizador
             setStatus('A desconectar e a gerar novo QR Code...');
             setQrCode('');
-            
             await axios.post(`${API_URL}/session/whatsapp/logout`, { clientId });
         } catch (error) {
             alert("Erro ao tentar desconectar o WhatsApp.");
@@ -85,13 +116,11 @@ function App() {
     }
   };
 
-  // FUNÇÃO: Sair da conta Google (Logout total)
   const handleLogoutGoogle = async () => {
     if (!clientId || !API_URL) return;
     if (confirm("Aviso: Isto irá remover a sua Conta Google do sistema e desativar o robô. Deseja continuar?")) {
         try {
             await axios.post(`${API_URL}/session/logout`, { clientId });
-            // Redireciona para o início e limpa o painel
             window.location.href = '/';
         } catch (error) {
             alert("Erro ao tentar sair da conta Google.");
@@ -117,6 +146,18 @@ function App() {
     .logout-wa-btn:hover { background-color: #ffe8a1; }
     .logout-google-btn { flex: 1; background-color: #fce8e6; color: #d93025; border: none; padding: 12px; border-radius: 8px; font-weight: 600; cursor: pointer; transition: background-color 0.2s; }
     .logout-google-btn:hover { background-color: #fad2cf; }
+    
+    /* Novos estilos para Configuração de Horários */
+    .config-box { margin-top: 25px; padding: 15px; border: 1px solid #e9edef; border-radius: 12px; background-color: #fafafa; text-align: left; }
+    .config-title { font-size: 15px; font-weight: 600; color: #111b21; margin-bottom: 12px; display: flex; align-items: center; gap: 6px; }
+    .time-inputs { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+    .time-field { display: flex; flex-direction: column; gap: 4px; flex: 1; }
+    .time-field label { font-size: 12px; color: #54656f; font-weight: 500; }
+    .time-field input { padding: 8px 12px; border: 1px solid #ccc; border-radius: 6px; font-size: 14px; color: #333; outline: none; }
+    .time-field input:focus { border-color: #25D366; }
+    .save-btn { width: 100%; background-color: #25D366; color: white; border: none; padding: 10px; border-radius: 8px; font-weight: 600; cursor: pointer; transition: background-color 0.2s; }
+    .save-btn:hover { background-color: #20b858; }
+    .save-btn:disabled { background-color: #8edfae; cursor: not-allowed; }
   `;
 
   return (
@@ -196,6 +237,37 @@ function App() {
                   </div>
                 </div>
               )}
+            </div>
+
+            {/* FEATURE: Painel de Configuração de Horários da IA */}
+            <div className="config-box">
+              <div className="config-title">⏰ Horário de Atendimento da IA</div>
+              <div className="time-inputs">
+                <div className="time-field">
+                  <label>Início</label>
+                  <input 
+                    type="time" 
+                    value={startTime} 
+                    onChange={(e) => setStartTime(e.target.value)} 
+                  />
+                </div>
+                <div style={{ color: '#888', fontWeight: 'bold' }}>-</div>
+                <div className="time-field">
+                  <label>Fim</label>
+                  <input 
+                    type="time" 
+                    value={endTime} 
+                    onChange={(e) => setEndTime(e.target.value)} 
+                  />
+                </div>
+              </div>
+              <button 
+                className="save-btn" 
+                onClick={salvarHorarios}
+                disabled={isSaving}
+              >
+                {isSaving ? 'A guardar...' : 'Guardar Horário'}
+              </button>
             </div>
 
             <div className="button-group">
