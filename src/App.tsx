@@ -170,7 +170,8 @@ function App() {
   const handleLogoutGoogle = async () => {
     if (!clientId || !API_URL) return;
 
-    if (confirm("Aviso: Isto irá remover a sua Conta Google do sistema e desativar o robô. Deseja continuar?")) {
+    // AVISO ATUALIZADO PARA INFORMAR QUE OS DADOS SÃO GUARDADOS
+    if (confirm("Isto irá desconectar a sua Conta Google e o WhatsApp, mas os seus horários e configurações da IA serão guardados. Deseja continuar?")) {
         try {
             await axios.post(`${API_URL}/session/logout`, { clientId });
             window.location.href = '/';
@@ -206,7 +207,8 @@ function App() {
     
     /* Imagens de Logo */
     .app-logo { max-width: 200px; height: auto; margin: 0 auto; display: block; }
-    .app-logo-login { max-width: 240px; height: auto; margin: 0 auto 10px auto; display: block; }
+    /* ATUALIZAÇÃO: O tamanho da logo no login foi reduzido para 80px */
+    .app-logo-login { max-width: 80px; height: auto; margin: 0 auto 10px auto; display: block; }
     .developer-footer { margin-top: auto; padding-top: 40px; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; }
     .dev-logo { max-width: 110px; height: auto; opacity: 0.6; transition: opacity 0.3s ease; }
     .dev-logo:hover { opacity: 1; }
@@ -275,7 +277,7 @@ function App() {
                     <path fill="#EA4335" d="M -14.754 43.989 C -12.984 43.989 -11.404 44.599 -10.154 45.789 L -6.734 42.369 C -8.804 40.429 -11.514 39.239 -14.754 39.239 C -19.444 39.239 -23.494 41.939 -25.464 45.859 L -21.484 48.949 C -20.534 46.099 -17.884 43.989 -14.754 43.989 Z" />
                   </g>
                 </svg>
-                <span>Entrar com Google Agenda</span>
+                <span>Entrar com Google </span>
               </button>
             </div>
           </div>
@@ -287,7 +289,7 @@ function App() {
               <div className="side-card">
                 <div className="toggle-section">
                   <div className="toggle-info">
-                    <h3 className="toggle-title">🤖 Atendimento Automático (IA)</h3>
+                    <h3 className="toggle-title"> Atendimento Automático </h3>
                     <p className="toggle-desc">
                       {isAiEnabled 
                         ? 'A IA está ativada e responderá às mensagens.' 
@@ -307,7 +309,7 @@ function App() {
               </div>
 
               <div className="side-card">
-                <h3 className="hours-title">⏰ Horário de Atendimento da IA</h3>
+                <h3 className="hours-title">Horário de Atendimento</h3>
                 <div className="hours-controls">
                   <div className="hour-input-group">
                     <label>Das</label>
@@ -331,7 +333,7 @@ function App() {
                   onClick={saveHours}
                   disabled={isSaving}
                 >
-                  {isSaving ? 'A guardar...' : 'Guardar Horário'}
+                  {isSaving ? 'A guardar...' : 'Salvar'}
                 </button>
               </div>
 
@@ -408,7 +410,7 @@ function App() {
               </div>
               
               <button onClick={handleLogoutGoogle} className="logout-google-btn" title="Remove a conta do sistema na íntegra">
-                Sair do Google
+                Desconectar
               </button>
             </div>
 
