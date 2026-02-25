@@ -22,6 +22,10 @@ function App() {
   const [startTime, setStartTime] = useState('08:00');
   const [endTime, setEndTime] = useState('18:00');
   const [isSaving, setIsSaving] = useState(false);
+
+  // Estados para o Interruptor da IA
+  const [isAiEnabled, setIsAiEnabled] = useState<boolean>(true);
+  const [isTogglingAi, setIsTogglingAi] = useState<boolean>(false);
    
   // 1. Verifica login do Google
   useEffect(() => {
@@ -32,6 +36,7 @@ function App() {
       setClientId(idFromUrl);
       iniciarSistema(idFromUrl);
       fetchHours(idFromUrl);
+      fetchAiStatus(idFromUrl); // Busca o status da IA ao carregar
     }
   }, []);
 
@@ -77,6 +82,44 @@ function App() {
       window.location.href = `${API_URL}/auth/google`;
   };
 
+  // --- NOVA FEATURE: BUSCAR STATUS DA IA ---
+  const fetchAiStatus = async (id: string) => {
+      if (!API_URL) return;
+      try {
+          const response = await axios.get(`${API_URL}/api/settings/ai-status/${id}`);
+          if (response.data && response.data.isAiEnabled !== undefined) {
+              setIsAiEnabled(response.data.isAiEnabled);
+          }
+      } catch (error) {
+          console.error("Erro ao buscar status da IA:", error);
+      }
+  };
+
+  // --- NOVA FEATURE: ALTERAR STATUS DA IA ---
+  const handleToggleAi = async () => {
+      if (!clientId || !API_URL) return;
+      
+      setIsTogglingAi(true);
+      const newValue = !isAiEnabled;
+      
+      // Atualização otimista na interface
+      setIsAiEnabled(newValue);
+
+      try {
+          await axios.post(`${API_URL}/api/settings/ai-status`, {
+              clientId,
+              isAiEnabled: newValue
+          });
+      } catch (error) {
+          console.error("Erro ao alterar status da IA:", error);
+          alert("Erro ao alterar o status da Inteligência Artificial.");
+          // Reverte o visual se der erro no servidor
+          setIsAiEnabled(!newValue);
+      } finally {
+          setIsTogglingAi(false);
+      }
+  };
+
   // BUSCAR HORÁRIOS SALVOS
   const fetchHours = async (id: string) => {
       if (!API_URL) return;
@@ -116,7 +159,6 @@ function App() {
 
     if (confirm("Deseja desconectar o seu telemóvel? Terá de ler o QR Code novamente para reativar o robô.")) {
         try {
-            // Atualiza a interface imediatamente para informar o utilizador
             setStatus('A desconectar e a gerar novo QR Code...');
             setQrCode('');
             
@@ -134,7 +176,6 @@ function App() {
     if (confirm("Aviso: Isto irá remover a sua Conta Google do sistema e desativar o robô. Deseja continuar?")) {
         try {
             await axios.post(`${API_URL}/session/logout`, { clientId });
-            // Redireciona para o início e limpa o painel
             window.location.href = '/';
         } catch (error) {
             alert("Erro ao tentar sair da conta Google.");
@@ -156,7 +197,22 @@ function App() {
     .user-label { color: #5f6368; }
     .user-email { color: #1a73e8; font-weight: 600; margin-left: 5px; }
     
-    .hours-section { background-color: #fff; border: 1px solid #e9edef; border-radius: 12px; padding: 20px; margin-top: 20px; text-align: left; }
+    /* ESTILOS DA SEÇÃO DO INTERRUPTOR DA IA */
+    .toggle-section { background-color: #fff; border: 1px solid #e9edef; border-radius: 12px; padding: 20px; margin-top: 20px; display: flex; justify-content: space-between; align-items: center; text-align: left; }
+    .toggle-info { flex: 1; padding-right: 15px; }
+    .toggle-title { font-size: 15px; font-weight: 600; color: #111b21; margin: 0 0 5px 0; display: flex; align-items: center; gap: 8px; }
+    .toggle-desc { font-size: 13px; color: #54656f; margin: 0; line-height: 1.4; }
+    
+    /* CSS DO BOTÃO SWITCH */
+    .switch { position: relative; display: inline-block; width: 50px; height: 26px; flex-shrink: 0; }
+    .switch input { opacity: 0; width: 0; height: 0; }
+    .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 26px; }
+    .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 4px; bottom: 4px; background-color: white; transition: .4s; border-radius: 50%; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+    input:checked + .slider { background-color: #25D366; }
+    input:checked + .slider:before { transform: translateX(24px); }
+    input:disabled + .slider { opacity: 0.6; cursor: not-allowed; }
+
+    .hours-section { background-color: #fff; border: 1px solid #e9edef; border-radius: 12px; padding: 20px; margin-top: 15px; text-align: left; }
     .hours-title { font-size: 15px; font-weight: 600; color: #111b21; margin: 0 0 15px 0; display: flex; align-items: center; gap: 8px; }
     .hours-controls { display: flex; gap: 15px; align-items: center; margin-bottom: 15px; }
     .hour-input-group { display: flex; flex-direction: column; gap: 5px; flex: 1; }
@@ -250,6 +306,27 @@ function App() {
                   </div>
                 </div>
               )}
+            </div>
+
+            {/* NOVA SEÇÃO: INTERRUPTOR DA IA */}
+            <div className="toggle-section">
+              <div className="toggle-info">
+                <h3 className="toggle-title">🤖 Atendimento Automático (IA)</h3>
+                <p className="toggle-desc">
+                  {isAiEnabled 
+                    ? 'A IA está ativada e responderá às mensagens.' 
+                    : 'A IA está em pausa. O robô irá ignorar as mensagens.'}
+                </p>
+              </div>
+              <label className="switch">
+                <input 
+                  type="checkbox" 
+                  checked={isAiEnabled} 
+                  onChange={handleToggleAi} 
+                  disabled={isTogglingAi}
+                />
+                <span className="slider"></span>
+              </label>
             </div>
 
             {/* SEÇÃO DE HORÁRIO DE FUNCIONAMENTO */}
