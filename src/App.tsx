@@ -17,6 +17,7 @@ function App() {
   const [clientId, setClientId] = useState<string | null>(null);
   const [qrCode, setQrCode] = useState('');
   const [status, setStatus] = useState('A carregar...');
+  const [isTimeout, setIsTimeout] = useState(false); // NOVO ESTADO: Controla a exibição do botão de tentar novamente
   
   // Estados para o horário de funcionamento
   const [startTime, setStartTime] = useState('08:00');
@@ -45,13 +46,20 @@ function App() {
     socket.on('qr', (qr: string) => { 
         setQrCode(qr); 
         setStatus('A aguardar leitura do QR Code...'); 
+        setIsTimeout(false);
     });
      
     socket.on('status', (msg: string) => { 
       if (msg === 'connected') { 
         setStatus('✅ Conectado com Sucesso!'); 
         setQrCode(''); 
-      } 
+        setIsTimeout(false);
+      } else if (msg === 'timeout' || msg === 'disconnected') {
+        // MUDANÇA: Exibe aviso de expiração e limpa o QR Code para o botão ser exibido
+        setStatus('⚠️ Sessão expirada por inatividade.');
+        setQrCode('');
+        setIsTimeout(true);
+      }
     });
 
     return () => { 
@@ -64,6 +72,7 @@ function App() {
       if (!API_URL) return;
 
       setStatus('A conectar ao servidor e a gerar QR Code...');
+      setIsTimeout(false); // Limpa o estado de timeout ao tentar novamente
       socket.emit('join', emailId);
 
       try {
@@ -204,7 +213,7 @@ function App() {
     /* Side Cards (Esquerda e Direita) */
     .side-card { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.04); margin-bottom: 20px; text-align: left; border: 1px solid #e9edef; }
     
-    /* MUDANÇA: Imagens de Logo reduzidas */
+    /* Imagens de Logo */
     .app-logo { max-width: 70px; height: auto; margin: 0 auto; display: block; }
     .app-logo-login { max-width: 80px; height: auto; margin: 0 auto 10px auto; display: block; }
     
@@ -252,6 +261,10 @@ function App() {
     
     .logout-wa-btn { width: 100%; background-color: #fff3cd; color: #856404; border: 1px solid #ffeeba; padding: 12px; border-radius: 8px; font-weight: 600; cursor: pointer; transition: background-color 0.2s; margin-top: 10px; }
     .logout-wa-btn:hover { background-color: #ffe8a1; }
+
+    /* NOVO BOTÃO DE RECARREGAR QR CODE */
+    .retry-qr-btn { background-color: #25D366; color: white; border: none; padding: 12px 20px; border-radius: 8px; font-weight: 600; font-size: 15px; cursor: pointer; transition: background-color 0.2s; margin-top: 15px; }
+    .retry-qr-btn:hover { background-color: #1DA851; }
   `;
 
   return (
@@ -375,13 +388,18 @@ function App() {
                         </ol>
                       </div>
                       
-                      <p className="status-text" style={{ fontWeight: '600', color: '#54656f', fontSize: '15px', margin: '0' }}>
+                      <p className="status-text" style={{ fontWeight: '600', color: isTimeout ? '#d93025' : '#54656f', fontSize: '15px', margin: '0' }}>
                         {status}
                       </p>
                       
-                      <div className="qr-frame" style={{ padding: '15px', background: 'white', borderRadius: '16px', boxShadow: '0 4px 15px rgba(0,0,0,0.05)', display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '240px', minWidth: '240px', border: '1px solid #e9edef' }}>
+                      <div className="qr-frame" style={{ padding: '15px', background: 'white', borderRadius: '16px', boxShadow: '0 4px 15px rgba(0,0,0,0.05)', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', minHeight: '240px', minWidth: '240px', border: '1px solid #e9edef' }}>
                         {qrCode ? (
                           <img src={`https://api.qrserver.com/v1/create-qr-code/?size=240x240&data=${encodeURIComponent(qrCode)}`} alt="QR Code WhatsApp" style={{ width: '240px', height: '240px', display: 'block' }} />
+                        ) : isTimeout ? (
+                          // MUDANÇA: Exibe um botão caso o tempo acabe
+                          <button className="retry-qr-btn" onClick={() => iniciarSistema(clientId)}>
+                            Gerar Novo QR Code
+                          </button>
                         ) : (
                           <div className="loading-spinner" style={{ color: '#888', fontWeight: '500', fontSize: '14px' }}>
                             A gerar código de acesso...
